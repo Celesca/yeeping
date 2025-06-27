@@ -3,6 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import type { TravelPlace } from '../types/TravelPlace';
+import { CoinSystem } from '../utils/coinSystem';
+import CoinCounter from './CoinCounter';
+import PhotoUpload from './PhotoUpload';
 
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -21,6 +24,9 @@ const RoutingPage: React.FC = () => {
   const location = useLocation();
   const { personality, duration } = (location.state as RoutingPageProps) || {};
   const [optimizedRoute, setOptimizedRoute] = useState<TravelPlace[]>([]);
+  const [currentJourney, setCurrentJourney] = useState<any>(null);
+  const [visitedPlaces, setVisitedPlaces] = useState<Set<string>>(new Set());
+  const [selectedPlace, setSelectedPlace] = useState<string | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('likedPlaces');
@@ -30,8 +36,50 @@ const RoutingPage: React.FC = () => {
       // Simple routing algorithm based on personality and duration
       const route = optimizeRoute(places, personality, duration);
       setOptimizedRoute(route);
+
+      // Create or load current journey
+      const existingJourney = CoinSystem.getCurrentJourney();
+      if (existingJourney && existingJourney.personality === personality && existingJourney.duration === duration) {
+        setCurrentJourney(existingJourney);
+        const visited = new Set(existingJourney.places.filter((p: any) => p.visited).map((p: any) => p.id));
+        setVisitedPlaces(visited);
+      } else {
+        const newJourney = CoinSystem.createNewJourney(personality || 'default', duration || 'custom', route);
+        setCurrentJourney(newJourney);
+      }
     }
   }, [personality, duration]);
+
+  const handlePlaceVisit = (placeId: string, photos: string[] = []) => {
+    if (photos.length > 0) {
+      const coinsEarned = CoinSystem.markPlaceAsVisited(placeId, photos);
+      if (coinsEarned > 0) {
+        setVisitedPlaces(prev => new Set([...prev, placeId]));
+        
+        // Trigger coin animation
+        window.dispatchEvent(new CustomEvent('coinUpdate', { detail: { earned: coinsEarned } }));
+        
+        // Update current journey state
+        const updatedJourney = CoinSystem.getCurrentJourney();
+        setCurrentJourney(updatedJourney);
+      }
+    }
+  };
+
+  const handlePhotoUpload = (placeId: string, photos: string[]) => {
+    if (photos.length > 0) {
+      photos.forEach(photo => {
+        CoinSystem.addPhotoToPlace(placeId, photo);
+      });
+      
+      // Mark place as visited when photos are uploaded and earn coins
+      handlePlaceVisit(placeId, photos);
+    }
+  };
+
+  const isPlaceVisited = (placeId: string) => {
+    return visitedPlaces.has(placeId);
+  };
 
   const optimizeRoute = (places: TravelPlace[], personality?: string, duration?: string): TravelPlace[] => {
     if (places.length === 0) return [];
@@ -298,7 +346,9 @@ const RoutingPage: React.FC = () => {
           <p className="text-sm text-purple-500">{optimizedRoute.length} destinations</p>
         </div>
         
-        <div className="w-20"></div> {/* Spacer for alignment */}
+        <div className="flex items-center space-x-4">
+          <CoinCounter showAnimation={true} />
+        </div>
       </div>
 
       <div className="p-6">
@@ -337,35 +387,73 @@ const RoutingPage: React.FC = () => {
             <h3 className="text-xl font-bold text-purple-800 mb-6">Optimized Route Order</h3>
             <div className="space-y-4">
               {optimizedRoute.map((place, index) => (
-                <div key={place.id} className="flex items-start space-x-4 p-4 bg-purple-50 rounded-xl">
-                  <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                    {index + 1}
-                  </div>
-                  
-                  <div className="flex-1">
-                    <h4 className="font-bold text-purple-800">{place.name}</h4>
-                    <p className="text-sm text-gray-600 mb-2">{place.description}</p>
-                    
-                    <div className="flex items-center justify-between text-xs text-purple-600">
-                      <span className="flex items-center">
-                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                        </svg>
-                        {place.lat.toFixed(4)}, {place.long.toFixed(4)}
-                      </span>
-                      
-                      {place.rating && (
-                        <span className="flex items-center">
-                          ⭐ {place.rating}
-                        </span>
-                      )}
+                <div key={place.id} className="p-4 bg-purple-50 rounded-xl border-2 border-purple-100">
+                  <div className="flex items-start space-x-4">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                      isPlaceVisited(place.id) 
+                        ? 'bg-green-500 text-white' 
+                        : 'bg-purple-600 text-white'
+                    }`}>
+                      {isPlaceVisited(place.id) ? '✓' : index + 1}
                     </div>
                     
-                    {index < optimizedRoute.length - 1 && (
-                      <div className="mt-2 text-xs text-gray-500">
-                        Distance to next: {calculateDistance(place, optimizedRoute[index + 1]).toFixed(2)} km
+                    <div className="flex-1">
+                      <h4 className="font-bold text-purple-800">{place.name}</h4>
+                      <p className="text-sm text-gray-600 mb-2">{place.description}</p>
+                      
+                      <div className="flex items-center justify-between text-xs text-purple-600 mb-3">
+                        <span className="flex items-center">
+                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                          </svg>
+                          {place.lat.toFixed(4)}, {place.long.toFixed(4)}
+                        </span>
+                        
+                        {place.rating && (
+                          <span className="flex items-center">
+                            ⭐ {place.rating}
+                          </span>
+                        )}
                       </div>
-                    )}
+                      
+                      {index < optimizedRoute.length - 1 && (
+                        <div className="mb-3 text-xs text-gray-500">
+                          Distance to next: {calculateDistance(place, optimizedRoute[index + 1]).toFixed(2)} km
+                        </div>
+                      )}
+
+                      {/* Visit Status */}
+                      {isPlaceVisited(place.id) ? (
+                        <div className="w-full bg-green-100 text-green-800 py-2 px-4 rounded-lg font-medium text-center mb-3">
+                          ✅ Visited! You earned coins from your photos!
+                        </div>
+                      ) : (
+                        <div className="w-full bg-blue-100 text-blue-800 py-2 px-4 rounded-lg font-medium text-center mb-3">
+                          📸 Upload photos to mark as visited and earn coins!
+                        </div>
+                      )}
+
+                      {/* Photo Upload Section */}
+                      {selectedPlace === place.id && (
+                        <div className="mt-4">
+                          <PhotoUpload
+                            placeId={place.id}
+                            placeName={place.name}
+                            onPhotosUploaded={(photos) => handlePhotoUpload(place.id, photos)}
+                          />
+                        </div>
+                      )}
+
+                      {/* Toggle Photo Upload */}
+                      {!isPlaceVisited(place.id) && (
+                        <button
+                          onClick={() => setSelectedPlace(selectedPlace === place.id ? null : place.id)}
+                          className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 text-sm"
+                        >
+                          {selectedPlace === place.id ? '📸 Hide Photo Upload' : '📸 Upload Photos (+10 🪙 each)'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

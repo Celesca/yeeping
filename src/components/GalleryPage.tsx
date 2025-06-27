@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { TravelPlace } from '../types/TravelPlace';
 import PersonalityModal from './PersonalityModal';
+import CoinCounter from './CoinCounter';
 
 const GalleryPage: React.FC = () => {
   const [likedPlaces, setLikedPlaces] = useState<TravelPlace[]>([]);
@@ -53,6 +54,7 @@ const GalleryPage: React.FC = () => {
         </div>
         
         <div className="flex items-center space-x-3">
+          <CoinCounter />
           {likedPlaces.length > 0 && (
             <button
               onClick={() => setIsModalOpen(true)}

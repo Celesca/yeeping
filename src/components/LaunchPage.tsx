@@ -1,9 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import CoinCounter from './CoinCounter';
 
 const LaunchPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-white flex flex-col items-center justify-center p-6">
+      {/* Coin Counter - Top Right */}
+      <div className="fixed top-6 right-6 z-10">
+        <CoinCounter />
+      </div>
+
       <div className="text-center space-y-8 max-w-md">
         {/* Logo/Icon */}
         <div className="w-24 h-24 mx-auto bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
