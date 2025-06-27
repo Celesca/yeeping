@@ -24,7 +24,7 @@ const RoutingPage: React.FC = () => {
   const location = useLocation();
   const { personality, duration } = (location.state as RoutingPageProps) || {};
   const [optimizedRoute, setOptimizedRoute] = useState<TravelPlace[]>([]);
-  const [currentJourney, setCurrentJourney] = useState<any>(null);
+  const [_, setCurrentJourney] = useState<any>(null);
   const [visitedPlaces, setVisitedPlaces] = useState<Set<string>>(new Set());
   const [selectedPlace, setSelectedPlace] = useState<string | null>(null);
 
