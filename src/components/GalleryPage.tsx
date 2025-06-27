@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { TravelPlace } from '../types/TravelPlace';
+import PersonalityModal from './PersonalityModal';
 
 const GalleryPage: React.FC = () => {
   const [likedPlaces, setLikedPlaces] = useState<TravelPlace[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // In a real app, you'd fetch this from localStorage or a backend
@@ -22,6 +25,12 @@ const GalleryPage: React.FC = () => {
     const updated = likedPlaces.filter(place => place.id !== placeId);
     setLikedPlaces(updated);
     localStorage.setItem('likedPlaces', JSON.stringify(updated));
+  };
+
+  const handleTravelPlan = (personality: string, duration: string) => {
+    navigate('/routing', { 
+      state: { personality, duration } 
+    });
   };
 
   return (
@@ -43,14 +52,24 @@ const GalleryPage: React.FC = () => {
           <p className="text-sm text-purple-500">{likedPlaces.length} saved places</p>
         </div>
         
-        {likedPlaces.length > 0 && (
-          <button
-            onClick={clearGallery}
-            className="text-red-500 hover:text-red-600 text-sm font-medium"
-          >
-            Clear All
-          </button>
-        )}
+        <div className="flex items-center space-x-3">
+          {likedPlaces.length > 0 && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
+            >
+              Travel
+            </button>
+          )}
+          {likedPlaces.length > 0 && (
+            <button
+              onClick={clearGallery}
+              className="text-red-500 hover:text-red-600 text-sm font-medium"
+            >
+              Clear All
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="p-6">
@@ -151,6 +170,13 @@ const GalleryPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Personality Modal */}
+      <PersonalityModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleTravelPlan}
+      />
     </div>
   );
 };

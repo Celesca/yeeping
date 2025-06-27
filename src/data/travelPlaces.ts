@@ -53,7 +53,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=500&fit=crop',
     description: 'Trendy area with cafes, shops, and modern lifestyle',
     country: 'Thailand',
-    rating: 4.5
+    rating: 4.5,
+    distance: "~1.2km"
   },
   {
     id: '6',
