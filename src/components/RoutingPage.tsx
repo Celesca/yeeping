@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import L from 'leaflet';
 import type { TravelPlace } from '../types/TravelPlace';
+
+// Fix for default markers in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 interface RoutingPageProps {
   personality?: string;
@@ -72,77 +82,199 @@ const RoutingPage: React.FC = () => {
     return R * c;
   };
 
-  const GraphVisualization = () => {
-    const svgSize = 400;
-    const centerX = svgSize / 2;
-    const centerY = svgSize / 2;
-    const radius = 150;
-
-    const nodePositions = optimizedRoute.map((_, index) => {
-      const angle = (index / optimizedRoute.length) * 2 * Math.PI - Math.PI / 2;
-      return {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle)
-      };
+  // Create custom numbered icons for the route
+  const createNumberedIcon = (number: number) => {
+    return L.divIcon({
+      html: `<div style="
+        background-color: #8B5CF6;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        border: 3px solid white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      ">${number}</div>`,
+      className: 'custom-div-icon',
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
     });
+  };
+
+  const MapVisualization = () => {
+    const [mapType, setMapType] = useState<'street' | 'satellite'>('street');
+    
+    // Center the map on Thailand (Chiang Mai area)
+    const thailandCenter: [number, number] = [18.7883, 98.9930];
+    
+    // Create path coordinates for the polyline
+    const pathCoordinates = optimizedRoute.map(place => [place.lat, place.long] as [number, number]);
 
     return (
       <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-purple-800 mb-4">Route Visualization</h3>
-        <svg width={svgSize} height={svgSize} className="mx-auto">
-          {/* Draw connections */}
-          {optimizedRoute.map((_, index) => {
-            if (index === optimizedRoute.length - 1) return null;
-            const start = nodePositions[index];
-            const end = nodePositions[index + 1];
-            return (
-              <line
-                key={`line-${index}`}
-                x1={start.x}
-                y1={start.y}
-                x2={end.x}
-                y2={end.y}
-                stroke="#8B5CF6"
-                strokeWidth="2"
-                strokeDasharray="5,5"
-              />
-            );
-          })}
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-bold text-purple-800">Interactive Route Map - Thailand</h3>
           
-          {/* Draw nodes */}
-          {optimizedRoute.map((place, index) => {
-            const pos = nodePositions[index];
-            return (
-              <g key={place.id}>
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r="20"
-                  fill="#8B5CF6"
-                  stroke="white"
-                  strokeWidth="3"
-                />
-                <text
-                  x={pos.x}
-                  y={pos.y + 5}
-                  textAnchor="middle"
-                  className="fill-white text-sm font-bold"
-                >
-                  {index + 1}
-                </text>
-                <text
-                  x={pos.x}
-                  y={pos.y - 30}
-                  textAnchor="middle"
-                  className="fill-purple-800 text-xs font-medium"
-                  style={{ maxWidth: '80px' }}
-                >
-                  {place.name.length > 12 ? place.name.substring(0, 12) + '...' : place.name}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
+          {/* Map Type Toggle */}
+          <div className="flex bg-purple-100 rounded-lg p-1">
+            <button
+              onClick={() => setMapType('street')}
+              className={`px-3 py-1 rounded text-sm font-medium transition-all ${
+                mapType === 'street' 
+                  ? 'bg-purple-600 text-white shadow-sm' 
+                  : 'text-purple-600 hover:bg-purple-200'
+              }`}
+            >
+              Street
+            </button>
+            <button
+              onClick={() => setMapType('satellite')}
+              className={`px-3 py-1 rounded text-sm font-medium transition-all ${
+                mapType === 'satellite' 
+                  ? 'bg-purple-600 text-white shadow-sm' 
+                  : 'text-purple-600 hover:bg-purple-200'
+              }`}
+            >
+              Satellite
+            </button>
+          </div>
+        </div>
+        
+        <div className="h-[500px] rounded-xl overflow-hidden border-2 border-purple-100">
+          <MapContainer
+            center={thailandCenter}
+            zoom={12}
+            style={{ height: '100%', width: '100%' }}
+            className="rounded-xl"
+          >
+            {/* Conditional tile layers based on map type */}
+            {mapType === 'street' ? (
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+            ) : (
+              <TileLayer
+                attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              />
+            )}
+            
+            {/* Add markers for each place in the route */}
+            {optimizedRoute.map((place, index) => (
+              <Marker
+                key={place.id}
+                position={[place.lat, place.long]}
+                icon={createNumberedIcon(index + 1)}
+              >
+                <Popup className="custom-popup">
+                  <div className="text-center min-w-[200px]">
+                    <div className="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-3">
+                      Stop {index + 1}
+                    </div>
+                    <h4 className="font-bold text-purple-800 mb-2 text-lg">
+                      {place.name}
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-3">{place.description}</p>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="bg-yellow-50 p-2 rounded">
+                        <div className="text-yellow-600">⭐ Rating</div>
+                        <div className="font-bold">{place.rating}</div>
+                      </div>
+                      <div className="bg-blue-50 p-2 rounded">
+                        <div className="text-blue-600">📍 Distance</div>
+                        <div className="font-bold">{place.distance}</div>
+                      </div>
+                    </div>
+                    {index < optimizedRoute.length - 1 && (
+                      <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                        Next: {calculateDistance(place, optimizedRoute[index + 1]).toFixed(2)} km
+                      </div>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+            
+            {/* Draw the route path */}
+            {pathCoordinates.length > 1 && (
+              <Polyline
+                positions={pathCoordinates}
+                pathOptions={{
+                  color: '#8B5CF6',
+                  weight: 5,
+                  opacity: 0.8,
+                  dashArray: '15, 10',
+                  lineCap: 'round',
+                  lineJoin: 'round'
+                }}
+              />
+            )}
+          </MapContainer>
+        </div>
+        
+        {/* Enhanced Map Controls and Legend */}
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Map Legend */}
+          <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl">
+            <h4 className="font-semibold text-purple-800 mb-3">Map Guide</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center space-x-3">
+                <div className="w-7 h-7 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">1</div>
+                <span>Route sequence (click for details)</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center">
+                  <div className="w-6 h-1 bg-purple-600"></div>
+                  <div className="w-2 h-1 bg-transparent"></div>
+                  <div className="w-6 h-1 bg-purple-600"></div>
+                </div>
+                <span>Optimized travel path</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-purple-600">🖱️</span>
+                <span>Zoom and pan to explore</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-purple-600">🗺️</span>
+                <span>Switch between Street/Satellite view</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Map Statistics */}
+          <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-100 rounded-xl">
+            <h4 className="font-semibold text-indigo-800 mb-3">Route Statistics</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-indigo-600">Region:</span>
+                <span className="font-bold">Chiang Mai, Thailand</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-indigo-600">Total Stops:</span>
+                <span className="font-bold">{optimizedRoute.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-indigo-600">Avg Rating:</span>
+                <span className="font-bold">
+                  {optimizedRoute.length > 0 && 
+                    (optimizedRoute.reduce((sum, place) => sum + (place.rating || 0), 0) / optimizedRoute.length).toFixed(1)
+                  } ⭐
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-indigo-600">Est. Travel Time:</span>
+                <span className="font-bold">
+                  {duration === '1 วัน ไม่ค้างคืน' ? '8-10 hours' : '2 days'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -199,9 +331,9 @@ const RoutingPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* Route List */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="xl:col-span-1 bg-white rounded-2xl shadow-lg p-6">
             <h3 className="text-xl font-bold text-purple-800 mb-6">Optimized Route Order</h3>
             <div className="space-y-4">
               {optimizedRoute.map((place, index) => (
@@ -238,10 +370,33 @@ const RoutingPage: React.FC = () => {
                 </div>
               ))}
             </div>
+            
+            {/* Total Distance Summary */}
+            <div className="mt-6 p-4 bg-gradient-to-r from-purple-100 to-purple-50 rounded-xl">
+              <h4 className="font-semibold text-purple-800 mb-2">Route Summary</h4>
+              <div className="text-sm text-purple-700">
+                <div className="flex justify-between mb-1">
+                  <span>Total Places:</span>
+                  <span className="font-bold">{optimizedRoute.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Total Distance:</span>
+                  <span className="font-bold">
+                    {optimizedRoute.length > 1 && 
+                      optimizedRoute.slice(0, -1).reduce((total, place, index) => 
+                        total + calculateDistance(place, optimizedRoute[index + 1]), 0
+                      ).toFixed(2)
+                    } km
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Graph Visualization */}
-          <GraphVisualization />
+          {/* Map Visualization */}
+          <div className="xl:col-span-2">
+            <MapVisualization />
+          </div>
         </div>
 
         {/* Action Buttons */}
