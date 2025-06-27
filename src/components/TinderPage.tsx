@@ -95,7 +95,7 @@ const TinderPage: React.FC = () => {
         </Link>
         
         <div className="text-center">
-          <div className="text-lg sm:text-xl font-bold text-purple-800">Travel Tinder</div>
+          <div className="text-lg sm:text-xl font-bold text-purple-800">YEEPING</div>
         </div>
         
         <Link 
@@ -120,7 +120,7 @@ const TinderPage: React.FC = () => {
       </div>
 
       {/* Cards container */}
-      <div className="flex justify-center items-center min-h-[60vh] px-4 pb-32">
+      <div className="flex justify-center items-start pt-8 sm:pt-12 min-h-[60vh] px-4 pb-32">
         <div className="relative flex justify-center items-center">
           {remainingPlaces.map((place, index) => (
             <TinderCard

@@ -56,7 +56,7 @@ const TinderCard: React.FC<TinderCardProps> = ({ place, onSwipe, isTop }) => {
       }}
       className={`absolute bg-white rounded-2xl shadow-xl overflow-hidden cursor-grab active:cursor-grabbing ${
         isTop ? 'z-20' : 'z-10'
-      } w-[85vw] max-w-sm h-[70vh] max-h-[600px] min-h-[500px]`}
+      } w-[85vw] max-w-sm h-[70vh] max-h-[600px] min-h-[500px] mt-120`}
     >
       <div className="relative h-full">
         <img
