@@ -35,19 +35,19 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ isOpen, onClose, on
     {
       id: '1 วัน ไม่ค้างคืน',
       name: '1 วัน ไม่ค้างคืน',
-      description: 'Day trip - 3-4 destinations',
+      description: 'Day trip - Maximum 3 destinations (randomly selected)',
       icon: '☀️'
     },
     {
       id: '2 วัน 1 คืน',
       name: '2 วัน 1 คืน', 
-      description: 'Weekend getaway - 5-6 destinations',
+      description: 'Weekend getaway - Maximum 6 destinations (optimally selected)',
       icon: '🌙'
     },
     {
       id: 'custom',
       name: 'Custom Duration',
-      description: 'Flexible itinerary',
+      description: 'Flexible itinerary - All your saved places included',
       icon: '📅'
     }
   ];

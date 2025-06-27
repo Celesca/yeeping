@@ -86,16 +86,7 @@ const RoutingPage: React.FC = () => {
 
     let filteredPlaces = [...places];
     
-    // Filter based on duration
-    if (duration === '1 วัน ไม่ค้างคืน') {
-      // Limit to 3-4 places for a day trip
-      filteredPlaces = places.slice(0, 4);
-    } else if (duration === '2 วัน 1 คืน') {
-      // Allow up to 6 places for 2 days
-      filteredPlaces = places.slice(0, 6);
-    }
-
-    // Sort based on personality
+    // Sort based on personality first, then filter by duration
     if (personality === 'introvert mode') {
       // Prioritize less crowded places (temples, nature)
       filteredPlaces.sort((a, b) => {
@@ -115,7 +106,40 @@ const RoutingPage: React.FC = () => {
       filteredPlaces.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     }
 
+    // Filter based on duration with random selection
+    let maxPlaces = filteredPlaces.length; // Default: use all places
+    
+    if (duration === '1 วัน ไม่ค้างคืน') {
+      maxPlaces = 3; // Limit to 3 places for a day trip
+    } else if (duration === '2 วัน 1 คืน') {
+      maxPlaces = 6; // Allow up to 6 places for 2 days
+    }
+
+    // If we have more places than the limit, randomly select from the sorted list
+    if (filteredPlaces.length > maxPlaces) {
+      // For personality-based sorting, take from the top-ranked places with some randomness
+      if (personality === 'introvert mode') {
+        // Take the best introvert places with some randomness
+        const topCandidates = filteredPlaces.slice(0, Math.min(maxPlaces * 2, filteredPlaces.length));
+        filteredPlaces = shuffleArray(topCandidates).slice(0, maxPlaces);
+      } else {
+        // For default sorting, take top-rated places with some randomness
+        const topCandidates = filteredPlaces.slice(0, Math.min(maxPlaces * 2, filteredPlaces.length));
+        filteredPlaces = shuffleArray(topCandidates).slice(0, maxPlaces);
+      }
+    }
+
     return filteredPlaces;
+  };
+
+  // Helper function to shuffle array for random selection
+  const shuffleArray = (array: TravelPlace[]): TravelPlace[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
   };
 
   const calculateDistance = (place1: TravelPlace, place2: TravelPlace): number => {
@@ -327,6 +351,23 @@ const RoutingPage: React.FC = () => {
     );
   };
 
+  const regenerateRoute = () => {
+    const saved = localStorage.getItem('likedPlaces');
+    if (saved) {
+      const places = JSON.parse(saved);
+      const newRoute = optimizeRoute(places, personality, duration);
+      setOptimizedRoute(newRoute);
+      
+      // Reset visited places for the new route
+      setVisitedPlaces(new Set());
+      setSelectedPlace(null);
+      
+      // Create a new journey with the regenerated route
+      const newJourney = CoinSystem.createNewJourney(personality || 'default', duration || 'custom', newRoute);
+      setCurrentJourney(newJourney);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-white">
       {/* Header */}
@@ -355,7 +396,7 @@ const RoutingPage: React.FC = () => {
         {/* Travel Settings Summary */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <h2 className="text-lg font-bold text-purple-800 mb-4">Trip Configuration</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
@@ -377,6 +418,51 @@ const RoutingPage: React.FC = () => {
                 <p className="text-sm text-gray-500">Duration</p>
                 <p className="font-semibold text-purple-800">{duration || 'Not specified'}</p>
               </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Selected Places</p>
+                <p className="font-semibold text-green-800">
+                  {optimizedRoute.length} {duration === '1 วัน ไม่ค้างคืน' ? '/ 3 max' : duration === '2 วัน 1 คืน' ? '/ 6 max' : 'places'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Selection Info */}
+          <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <span className="text-sm text-blue-800">
+                  {duration === '1 วัน ไม่ค้างคืน' 
+                    ? `Randomly selected 3 places from your gallery for a perfect day trip`
+                    : duration === '2 วัน 1 คืน'
+                    ? `Optimally selected up to 6 places for your 2-day adventure`
+                    : `All your favorite places included in this itinerary`
+                  }
+                </span>
+              </div>
+              
+              {/* Regenerate Button - only show for limited duration trips */}
+              {(duration === '1 วัน ไม่ค้างคืน' || duration === '2 วัน 1 คืน') && (
+                <button
+                  onClick={regenerateRoute}
+                  className="flex items-center space-x-1 bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-600 transition-colors duration-200"
+                >
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                  </svg>
+                  <span>New Selection</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
