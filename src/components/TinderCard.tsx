@@ -54,15 +54,15 @@ const TinderCard: React.FC<TinderCardProps> = ({ place, onSwipe, isTop }) => {
         scale,
         touchAction: 'none',
       }}
-      className={`absolute w-80 h-96 bg-white rounded-2xl shadow-xl overflow-hidden cursor-grab active:cursor-grabbing ${
+      className={`absolute bg-white rounded-2xl shadow-xl overflow-hidden cursor-grab active:cursor-grabbing ${
         isTop ? 'z-20' : 'z-10'
-      }`}
+      } w-[85vw] max-w-sm h-[70vh] max-h-[600px] min-h-[500px]`}
     >
       <div className="relative h-full">
         <img
           src={place.image}
           alt={place.name}
-          className="w-full h-2/3 object-cover"
+          className="w-full h-3/5 sm:h-2/3 object-cover"
           draggable={false}
         />
         
@@ -71,7 +71,7 @@ const TinderCard: React.FC<TinderCardProps> = ({ place, onSwipe, isTop }) => {
           style={{
             opacity: x.to((val) => (val > 0 ? val / 100 : 0)),
           }}
-          className="absolute top-8 right-8 bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-lg transform rotate-12"
+          className="absolute top-6 sm:top-8 right-6 sm:right-8 bg-green-500 text-white px-3 sm:px-4 py-2 rounded-lg font-bold text-base sm:text-lg transform rotate-12"
         >
           LOVE IT!
         </animated.div>
@@ -80,28 +80,28 @@ const TinderCard: React.FC<TinderCardProps> = ({ place, onSwipe, isTop }) => {
           style={{
             opacity: x.to((val) => (val < 0 ? Math.abs(val) / 100 : 0)),
           }}
-          className="absolute top-8 left-8 bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-lg transform -rotate-12"
+          className="absolute top-6 sm:top-8 left-6 sm:left-8 bg-red-500 text-white px-3 sm:px-4 py-2 rounded-lg font-bold text-base sm:text-lg transform -rotate-12"
         >
           PASS
         </animated.div>
 
         {/* Content */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
-          <h3 className="text-2xl font-bold mb-1">{place.name}</h3>
-          <p className="text-sm opacity-90 mb-2">{place.description}</p>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 sm:p-6 text-white">
+          <h3 className="text-xl sm:text-2xl font-bold mb-1">{place.name}</h3>
+          <p className="text-xs sm:text-sm opacity-90 mb-2 line-clamp-2">{place.description}</p>
           
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center space-x-1">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
               </svg>
-              <span>{place.lat.toFixed(4)}, {place.long.toFixed(4)}</span>
+              <span className="text-xs">{place.lat.toFixed(4)}, {place.long.toFixed(4)}</span>
             </div>
             
             {place.rating && (
               <div className="flex items-center space-x-1">
                 <span>⭐</span>
-                <span>{place.rating}</span>
+                <span className="text-xs">{place.rating}</span>
               </div>
             )}
           </div>
