@@ -1,0 +1,114 @@
+import React from 'react';
+import { useSpring, animated } from 'react-spring';
+import { useDrag } from 'react-use-gesture';
+import type { TravelPlace } from '../types/TravelPlace';
+
+interface TinderCardProps {
+  place: TravelPlace;
+  onSwipe: (direction: 'left' | 'right') => void;
+  isTop: boolean;
+}
+
+const TinderCard: React.FC<TinderCardProps> = ({ place, onSwipe, isTop }) => {
+  const [{ x, y, rotate, scale }, api] = useSpring(() => ({
+    x: 0,
+    y: 0,
+    rotate: 0,
+    scale: 1,
+  }));
+
+  const bind = useDrag(
+    ({ movement: [mx, my], direction: [xDir], down }) => {
+      const trigger = Math.abs(mx) > 100;
+      const dir = xDir < 0 ? 'left' : 'right';
+      
+      if (!down && trigger) {
+        onSwipe(dir);
+        api.start({
+          x: (200 + window.innerWidth) * (mx > 0 ? 1 : -1),
+          y: my,
+          rotate: mx / 10,
+          scale: 1,
+          config: { tension: 200, friction: 30 }
+        });
+      } else {
+        api.start({
+          x: down ? mx : 0,
+          y: down ? my : 0,
+          rotate: down ? mx / 10 : 0,
+          scale: down ? 1.1 : 1,
+          config: { tension: 300, friction: 30 }
+        });
+      }
+    },
+    { enabled: isTop }
+  );
+
+  return (
+    <animated.div
+      {...bind()}
+      style={{
+        x,
+        y,
+        rotate,
+        scale,
+        touchAction: 'none',
+      }}
+      className={`absolute w-80 h-96 bg-white rounded-2xl shadow-xl overflow-hidden cursor-grab active:cursor-grabbing ${
+        isTop ? 'z-20' : 'z-10'
+      }`}
+    >
+      <div className="relative h-full">
+        <img
+          src={place.image}
+          alt={place.name}
+          className="w-full h-2/3 object-cover"
+          draggable={false}
+        />
+        
+        {/* Overlay indicators */}
+        <animated.div
+          style={{
+            opacity: x.to((val) => (val > 0 ? val / 100 : 0)),
+          }}
+          className="absolute top-8 right-8 bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-lg transform rotate-12"
+        >
+          LOVE IT!
+        </animated.div>
+        
+        <animated.div
+          style={{
+            opacity: x.to((val) => (val < 0 ? Math.abs(val) / 100 : 0)),
+          }}
+          className="absolute top-8 left-8 bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-lg transform -rotate-12"
+        >
+          PASS
+        </animated.div>
+
+        {/* Content */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
+          <h3 className="text-2xl font-bold mb-1">{place.name}</h3>
+          <p className="text-sm opacity-90 mb-2">{place.description}</p>
+          
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-1">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <span>{place.lat.toFixed(4)}, {place.long.toFixed(4)}</span>
+            </div>
+            
+            {place.rating && (
+              <div className="flex items-center space-x-1">
+                <span>⭐</span>
+                <span>{place.rating}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </animated.div>
+  );
+};
+
+export default TinderCard;
