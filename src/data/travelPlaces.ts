@@ -9,7 +9,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     image: 'https://images.unsplash.com/photo-1563492065-874c0ce50cf9?w=400&h=500&fit=crop',
     description: 'Beautiful Buddhist temple with stunning city views',
     country: 'Thailand',
-    rating: 4.8
+    rating: 4.8,
+    distance: "~500m"
   },
   {
     id: '2',
@@ -19,7 +20,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     image: 'https://images.unsplash.com/photo-1552550049-db097c9480d1?w=400&h=500&fit=crop',
     description: 'Historic walled city with ancient temples and culture',
     country: 'Thailand',
-    rating: 4.6
+    rating: 4.6,
+    distance: "~1km"
   },
   {
     id: '3',
@@ -29,7 +31,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     image: 'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=500&fit=crop',
     description: 'Ethical elephant sanctuary in natural habitat',
     country: 'Thailand',
-    rating: 4.9
+    rating: 4.9,
+    distance: "~502m"
   },
   {
     id: '4',
@@ -39,7 +42,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     image: 'https://images.unsplash.com/photo-1555400113-3ba9a9bf2e8d?w=400&h=500&fit=crop',
     description: 'Vibrant night market with local crafts and food',
     country: 'Thailand',
-    rating: 4.4
+    rating: 4.4,
+    distance: "~800m"
   },
   {
     id: '5',
@@ -59,6 +63,7 @@ export const mockTravelPlaces: TravelPlace[] = [
     image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=500&fit=crop',
     description: 'Historic temple with beautiful Lanna architecture',
     country: 'Thailand',
-    rating: 4.7
+    rating: 4.7,
+    distance: "~600m"
   }
 ];

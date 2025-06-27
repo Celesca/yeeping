@@ -7,6 +7,7 @@ export interface TravelPlace {
   description?: string;
   country?: string;
   rating?: number;
+  distance?: string;
 }
 
 export interface UserGallery {
