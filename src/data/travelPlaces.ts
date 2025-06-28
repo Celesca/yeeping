@@ -10,7 +10,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'It is a peaceful place for meditation and spiritual practice. Visitors can walk through the tunnels, take photos, and pay respect to the Buddha images enshrined within. The temple grounds are shaded by large trees, and during the rainy season, the old walls are beautifully covered with green moss, adding to the serene and lively atmosphere.',
     country: 'Thailand',
     rating: 4.6,
-    distance: "~3.2km"
+    distance: "~3.2km",
+    tags: ["Culture", "Green", "PM2.5 free"]
   },
   {
     id: '2',
@@ -21,7 +22,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'This small reservoir features pleasant walking and jogging trails, along with benches and open grassy lawns ideal for relaxing or picnicking',
     country: 'Thailand',
     rating: 4.7,
-    distance: "~3.4km"
+    distance: "~3.4km",
+    tags: ["Green", "PM2.5 free"]
   },
  {
     id: '3',
@@ -32,7 +34,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'It is the new public park of Chiang Mai Province that has quickly become popular as a beautiful place for relaxation and exercise. The park features a shady and natural atmosphere, along with stunning mountain views',
     country: 'Thailand',
     rating: 4.7,
-    distance: "~6.3km"
+    distance: "~6.3km",
+    tags: ["Green", "PM2.5 free"]
   },
 
   {
@@ -44,7 +47,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'Mae Kha Canal is an ancient canal that holds significant historical importance and plays a vital role in the way of life of Chiang Mai city. Originally, it served as both the outer moat of the city and a drainage system',
     country: 'Thailand',
     rating: 4.2,
-    distance: "~5.8km"
+    distance: "~5.8km",
+    tags: ["Culture", "Green"]
   },
   {
     id: '5',
@@ -55,7 +59,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'A full-service organic farm located in Chiang Mai Province offering a variety of activities for children and families, such as vegetable planting, egg collecting, rice planting, harvesting, threshing, cooking, making traditional Thai desserts, clay molding, and kids yoga',
     country: 'Thailand',
     rating: 4.5,
-    distance: "~13.5km"
+    distance: "~13.5km",
+    tags: ["Green", "Culture", "PM2.5 free"]
   },
  {
     id: '6',
@@ -66,7 +71,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'An elegant Lanna-style architecture, the building is a two-story half-wood, half-brick structure painted in reddish-brown. It stands proudly on a hill, covering an area of approximately 3,000 square meters amidst more than 470 rai of land at the Chiang Mai Royal Agricultural Research Center',
     country: 'Thailand',
     rating: 4.7,
-    distance: "~10.7km"
+    distance: "~10.7km",
+    tags: ["Culture", "Green", "PM2.5 free"]
   },
    {
     id: '7',
@@ -77,7 +83,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'Discover One Nimman Select—a vibrant treasure trove of Thai designer pieces, local crafts, and unique Chiang Mai souvenirs, all handpicked for quality and charm, right in the heart of Nimman.',
     country: 'Thailand',
     rating: 4.5,
-    distance: "~750m"
+    distance: "~750m",
+    tags: ["Street", "Culture"]
   },
  {
     id: '8',
@@ -88,7 +95,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'Think Park is Chiang Mai’s first art-inspired open-air shopping hub, where trendy cafés, unique local boutiques, and a vibrant night market come together to offer handmade crafts, stylish fashion, and live music in a creative, youthful atmosphere.',
     country: 'Thailand',
     rating: 4.3,
-    distance: "~1km"
+    distance: "~1km",
+    tags: ["Street", "Culture"]
   },
   {
     id: '10',
@@ -99,7 +107,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'ร้านสุกี้ช้างเผือกสาขาตลาดโต้รุ่งเป็นหนึ่งในร้านสตรีทฟู้ดเจ้าดังที่อยู่คู่ขวัญชาวเชียงใหม่มานาน ความพิเศษของสุกี้ร้านนี้คือ สุกี้แห้งที่หอมกลิ่นกระทะ รวมถึงปริมาณเครื่องที่ให้มาแบบจัดเต็มในราคาที่จับต้องได้ จึงนับว่าเป็นหนึ่งในของเด็ดของดีที่ต้องได้มาลองสักครั้งของเชียงใหม่',
     country: 'Thailand',
     rating: 4.5,
-    distance: "~2.2km"
+    distance: "~2.2km",
+    tags: ["Street", "Culture"]
   },
   {
     id: '11',
@@ -110,7 +119,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'ร้าน Khao-Sō-i ข้าวโซอิ แม้จะพึ่งตั้งได้ไม่นานแต่ด้วยความร่อยหนึบนุ่มของเส้นข้าวซอยสดที่โชว์กระบวนวิธีการทำให้ดูต่อหน้า น้ำซุปเข้มข้นตามต้นตำรับ และการตกแต่งร้านสไตล์ญี่ปุ่น เรียกได้ว่าแทบจะพลิกโฉมการทานข้าวซอยแบบปกติของเราไปเลยทีเดียว',
     country: 'Thailand',
     rating: 4.8,
-    distance: "~6.8km"
+    distance: "~6.8km",
+    tags: ["Street", "Culture"]
   },
   {
     id: '12',
@@ -121,7 +131,8 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'The highlight is the rich, aromatic Khao Soi curry soup, well-rounded flavor, not too oily, and the noodles are just the right amount of soft.',
     country: 'Thailand',
     rating: 4.5,
-    distance: "~500m"
+    distance: "~500m",
+    tags: ["Street", "Culture"]
   },
   {
     id: '13',
@@ -132,6 +143,7 @@ export const mockTravelPlaces: TravelPlace[] = [
     description: 'Historic walled city with ancient temples and culture',
     country: 'Thailand',
     rating: 4.8,
-    distance: "~2km"
+    distance: "~2km",
+    tags: ["Street", "Culture"]
   },
 ]

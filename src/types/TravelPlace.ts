@@ -8,6 +8,7 @@ export interface TravelPlace {
   country?: string;
   rating?: number;
   distance?: string;
+  tags: string[];
 }
 
 export interface VisitedPlace extends TravelPlace {

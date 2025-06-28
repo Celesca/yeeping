@@ -88,6 +88,25 @@ const TinderCard: React.FC<TinderCardProps> = ({ place, onSwipe, isTop }) => {
         {/* Content */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 sm:p-6 text-white">
           <h3 className="text-xl sm:text-2xl font-bold mb-1">{place.name}</h3>
+          
+          {/* Tags */}
+          <div className="flex flex-wrap gap-1 mb-2">
+            {place.tags.map((tag, index) => (
+              <span
+                key={index}
+                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  tag === 'Green' ? 'bg-green-500/80 text-white' :
+                  tag === 'Culture' ? 'bg-purple-500/80 text-white' :
+                  tag === 'PM2.5 free' ? 'bg-blue-500/80 text-white' :
+                  tag === 'Street' ? 'bg-orange-500/80 text-white' :
+                  'bg-gray-500/80 text-white'
+                }`}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          
           <p className="text-xs sm:text-sm opacity-90 mb-2 line-clamp-2">{place.description}</p>
           
           <div className="flex items-center justify-between text-xs">
