@@ -88,26 +88,35 @@ const TinderCard: React.FC<TinderCardProps> = ({ place, onSwipe, isTop }) => {
         {/* Content */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 sm:p-6 text-white">
           <h3 className="text-xl sm:text-2xl font-bold mb-1">{place.name}</h3>
-          
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1 mb-2">
-            {place.tags.map((tag, index) => (
-              <span
-                key={index}
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  tag === 'Green' ? 'bg-green-500/80 text-white' :
-                  tag === 'Culture' ? 'bg-purple-500/80 text-white' :
-                  tag === 'PM2.5 free' ? 'bg-blue-500/80 text-white' :
-                  tag === 'Street' ? 'bg-orange-500/80 text-white' :
-                  'bg-gray-500/80 text-white'
-                }`}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-          
           <p className="text-xs sm:text-sm opacity-90 mb-2 line-clamp-2">{place.description}</p>
+          
+          {/* Tags Section */}
+          {place.tags && place.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {place.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    tag === 'Green' 
+                      ? 'bg-green-500/20 text-green-100 border border-green-400/30'
+                      : tag === 'Culture'
+                      ? 'bg-purple-500/20 text-purple-100 border border-purple-400/30'
+                      : tag === 'PM2.5 free'
+                      ? 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
+                      : tag === 'Street'
+                      ? 'bg-orange-500/20 text-orange-100 border border-orange-400/30'
+                      : 'bg-gray-500/20 text-gray-100 border border-gray-400/30'
+                  }`}
+                >
+                  {tag === 'Green' && '🌿'} 
+                  {tag === 'Culture' && '🏛️'} 
+                  {tag === 'PM2.5 free' && '💨'} 
+                  {tag === 'Street' && '🛣️'} 
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
           
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center space-x-1">

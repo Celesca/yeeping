@@ -129,6 +129,11 @@ const RoutingPage: React.FC = () => {
       }
     }
 
+    // Optimize route order based on geographical proximity (nearest neighbor algorithm)
+    if (filteredPlaces.length > 1) {
+      filteredPlaces = optimizeRouteOrder(filteredPlaces);
+    }
+
     return filteredPlaces;
   };
 
@@ -152,6 +157,39 @@ const RoutingPage: React.FC = () => {
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
+  };
+
+  // Optimize route order using nearest neighbor algorithm to minimize travel distance
+  const optimizeRouteOrder = (places: TravelPlace[]): TravelPlace[] => {
+    if (places.length <= 1) return places;
+
+    const unvisited = [...places];
+    const optimizedRoute: TravelPlace[] = [];
+
+    // Start with the first place (could be optimized to start with the northernmost/westernmost point)
+    let currentPlace = unvisited.shift()!;
+    optimizedRoute.push(currentPlace);
+
+    // Use nearest neighbor algorithm
+    while (unvisited.length > 0) {
+      let nearestIndex = 0;
+      let shortestDistance = calculateDistance(currentPlace, unvisited[0]);
+
+      // Find the nearest unvisited place
+      for (let i = 1; i < unvisited.length; i++) {
+        const distance = calculateDistance(currentPlace, unvisited[i]);
+        if (distance < shortestDistance) {
+          shortestDistance = distance;
+          nearestIndex = i;
+        }
+      }
+
+      // Move to the nearest place
+      currentPlace = unvisited.splice(nearestIndex, 1)[0];
+      optimizedRoute.push(currentPlace);
+    }
+
+    return optimizedRoute;
   };
 
   // Create custom numbered icons for the route
