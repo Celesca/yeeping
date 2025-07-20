@@ -89,7 +89,7 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ isOpen, onClose, on
                 <button
                   key={personality.id}
                   onClick={() => setSelectedPersonality(personality.id)}
-                  className={`p-4 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-md ${
+                  className={`p-4 rounded-xl border-2 text-left transition-all duration-200 hover:cursor-pointer hover:shadow-md ${
                     selectedPersonality === personality.id
                       ? 'border-purple-500 bg-purple-50'
                       : 'border-gray-200 hover:border-purple-300'
@@ -124,7 +124,7 @@ const PersonalityModal: React.FC<PersonalityModalProps> = ({ isOpen, onClose, on
                 <button
                   key={duration.id}
                   onClick={() => setSelectedDuration(duration.id)}
-                  className={`p-4 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-md ${
+                  className={`p-4 rounded-xl border-2 text-left transition-all duration-200 hover:cursor-pointer hover:shadow-md ${
                     selectedDuration === duration.id
                       ? 'border-purple-500 bg-purple-50'
                       : 'border-gray-200 hover:border-purple-300'
