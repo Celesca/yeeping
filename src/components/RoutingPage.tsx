@@ -192,29 +192,6 @@ const RoutingPage: React.FC = () => {
     return optimizedRoute;
   };
 
-  // Create custom numbered icons for the route
-  const createNumberedIcon = (number: number) => {
-    return L.divIcon({
-      html: `<div style="
-        background-color: #8B5CF6;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 14px;
-        border: 3px solid white;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      ">${number}</div>`,
-      className: 'custom-div-icon',
-      iconSize: [30, 30],
-      iconAnchor: [15, 15],
-    });
-  };
-
   const MapVisualization = () => {
     const [mapType, setMapType] = useState<'street' | 'satellite'>('street');
     
@@ -223,6 +200,29 @@ const RoutingPage: React.FC = () => {
     
     // Create path coordinates for the polyline
     const pathCoordinates = optimizedRoute.map(place => [place.lat, place.long] as [number, number]);
+
+    const createNumberedIcon = (number: number): L.DivIcon => {
+      return L.divIcon({
+        html: `<div style="
+          background-color: #8B5CF6;
+          color: white;
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 14px;
+          border: 3px solid white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        ">${number}</div>`,
+        className: 'numbered-marker',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
+      });
+    };
 
     return (
       <div className="bg-white rounded-2xl shadow-lg p-6">
